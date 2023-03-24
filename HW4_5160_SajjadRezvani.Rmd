@@ -1,0 +1,136 @@
+---
+title: "HW4_5160_SajjadRezani"
+author: "Sajjad Rezvani"
+date: "02/23/2023"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    toc: yes
+---
+
+---
+
+
+# Question 1: MA(2) Yt = et − 0.5et−1 − 0.4et−2
+
+## 1.a. Finding the AUTOCORRELATION function ρk , k = 0, 1, 2, . . ..   
+
+The AUOTOCORRELATION function for MA(2):  
+
+
+\[   
+\rho_k = 
+     \begin{cases}
+       \text{1} &\quad\text{if k=0}\\
+       \frac{\theta_1\theta_2-\theta_1 }{1+\theta^2_1+\theta^2_2} &\quad\text{if  k=1} \\
+       -\frac{\theta_2}{1+\theta^2_1+\theta^2_2} &\quad\text{if  k=2}\\
+       \text{0} &\quad\text{k>2} \\ 
+     \end{cases}
+\]
+
+---
+
+## 1.b. R code to verify the answer   
+```{r}
+ARMAacf(ma=c(-0.5,-0.4))
+```
+```{r}
+theta1= 0.5
+theta2= 0.4
+cat("Correlation for k=0 is ", "1", "\n") 
+cat("Correlation for k=1 is ", (theta1*theta2-theta1)/(1+theta1^2+theta2^2), "\n")
+cat("Correlation for k=2 is ", (-theta2)/(1+theta1^2+theta2^2), "\n")
+cat("Correlation for k>2 is ", "0", "\n")
+```
+
+---
+
+## 1.c. R code to sketch the autocorrelation function  
+```{r}
+ACF=ARMAacf(ma=c(-0.5,-0.4),lag.max=4)
+plot(y=ACF,x=0:4,xlab='Lag',ylab='ACF',main="Population ACF", type='h')
+abline(h=0)
+```
+
+
+<hr style=" height:4px; width:90%; border:3px solid red; border-radius:12px; background-color: blue">
+
+
+# Question 2: AR(1)   Yt = 0.6Yt−1 + et
+
+## 2.a. Finding the AUTOCORRELATION function  
+
+$$\rho_k = \phi^k$$   
+```{r}
+phi= 0.6
+k= seq(1,8)
+round(phi^k,4)
+```
+$$\rho_1 = 0.6000 \ ,\ \rho_2 = 0.3600 \ , \ \rho_3= 0.2160 \ , \ \rho_4=0.1296 \ , \\ \rho_5=0.0778  \ , \ \rho_6=0.0467  \ , \ \rho_7=0.0280 \ , \ \rho_8=0.0168$$   
+
+---
+
+## 2.b. R code to verify your answer in part a  
+```{r}
+ARMAacf(ar=c(0.6), lag.max=8)[c(2:9)]
+```
+
+---
+
+## 2.c. R code to sketch the autocorrelation function   
+```{r}
+ACF=ARMAacf(ar=c(0.6), lag.max=8)
+plot(y=ACF[-1],x=1:8,ylim = c(-0.1,0.6) ,xlab='Lag',ylab='ACF',main="Population ACF", type='h')
+abline(h=0)
+```
+
+
+
+<hr style=" height:4px; width:90%; border:3px solid red; border-radius:12px; background-color: blue">
+
+
+# Question 3 :Generate two time series data sets, each of length n = 200,including (i) an AR(1) with φ = −0.6, (ii) an MA(2) with θ1 = 0.8, θ2 = −0.5. Use set.seed(2) when you generate the data sets 
+## 3.a. Plot the observed time series  
+### 3.a.1. AR(1)  
+```{r}
+set.seed(2)
+ar.sim <- arima.sim(list(order = c(1,0,0), ar = -0.6), n = 200)
+plot(ar.sim,ylab=expression(Y[t]),xlab="Time",type="o",main="AR(1) simulation")
+abline(h=0 , col= "red")
+```
+
+### 3.a.2. MA(2)  
+```{r}
+set.seed(2)
+ma.sim <- arima.sim(list(order = c(0,0,2), ma = c(-0.8,0.5)), n = 200)
+plot(ma.sim,ylab=expression(Y[t]),xlab="Time",type="o",main="MA(2) simulation")
+abline(h=0, col= "red")
+```
+
+---
+
+## 3.b. Plot the sample ACFs  
+### 3.b.1. AR(1)  
+```{r}
+acf(ar.sim,main="Sample ACF, AR(1)")
+```
+
+### 3.b.2. MA(2)  
+```{r}
+acf(ma.sim,main="Sample ACF, MA(2)")
+```
+
+---
+
+## 3.c. Describe the important characteristics of the autocorrelation function    
+### 3.c.1. AR(1)  
+The autocorrelation decreases exponentially in this model from lag 0.And it alternates between positive and negative values for φ < 0.   
+
+### 3.c.2. MA(2)  
+For MA(2) plot we can see that the correlation for first two lags (lag=1 & lag=2) is non zero,but for the rest it is about zero.
+
+
+<hr style=" height:4px; width:90%; border:3px solid red; border-radius:12px; background-color: blue">
+
